@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abhay's Consistency Tracker 🌟</title>
+  <style>
+    :root {
+      --primary-color: #3f3d56;
+      --secondary-color: #6495ed;
+      --level-1: #add8e6;
+      --level-2: #6495ed;
+      --level-3: #1e3a8a;
+      --text-light: #ffffff;
+      --text-dark: #2e2e2e;
+      --bg-light: #f0f4ff;
+      --card-bg: #ffffff;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      --border-radius: 15px;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .calendar-container {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+    
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .day {
+      padding: 15px 5px;
+      background: #e4e9f7;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    
+    .day:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .day-number {
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+    
+    .day-emoji {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .level-1 { background-color: var(--level-1); }
+    .level-2 { background-color: var(--level-2); color: var(--text-light); }
+    .level-3 { background-color: var(--level-3); color: var(--text-light); }
+    
+    .summary-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .summary-card {
+      padding: 15px;
+      background: #e0f7fa;
+      border-radius: var(--border-radius);
+      text-align: left;
+    }
+    
+    .month-selector {
+      margin: 15px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .month-selector select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background-color: white;
+    }
+    
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      font-weight: bold;
+      color: #374151;
+      margin-bottom: 5px;
+    }
+    
+    .weekdays div {
+      padding: 5px;
+    }
+    
+    .quote-box {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff4e6;
+      border-left: 5px solid #ffa726;
+      font-style: italic;
+      border-radius: var(--border-radius);
+    }
+    
+    .badges {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ffd700, #ffb700);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn {
+      background-color: var(--secondary-color);
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin: 5px;
+    }
+    
+    .btn:hover {
+      background-color: #3f3d56;
+      transform: translateY(-2px);
+    }
+    
+    .btn-group {
+      margin: 15px 0;
+    }
+    
+    .progress-container {
+      margin-top: 15px;
+    }
+    
+    .progress-bar {
+      height: 20px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--level-1), var(--level-3));
+      transition: width 0.5s ease;
+    }
+    
+    .current-day {
+      position: relative;
+    }
+    
+    .current-day::after {
+      content: '';
+      position: absolute;
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 6px;
+      height: 6px;
+      background-color: #ff5252;
+      border-radius: 50%;
+    }
+    
+    @media (max-width: 600px) {
+      .summary-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .day {
+        padding: 10px 2px;
+        font-size: 14px;
+      }
+      
+      .calendar-container {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌞 Abhay's Consistency Tracker</h1>
+    
+    <div class="btn-group">
+      <button class="btn" onclick="setStartDate()">📅 Set Journey Start Date</button>
+      <button class="btn" onclick="exportData()">💾 Export Data</button>
+      <button class="btn" onclick="importData()">📂 Import Data</button>
+      <button class="btn" onclick="showHelp()">❓ Help</button>
+    </div>
+    
+    <div class="calendar-container">
+      <div class="month-selector">
+        <label for="month">Month:</label>
+        <select id="month" onchange="renderCalendar()"></select>
+        <label for="year">Year:</label>
+        <select id="year" onchange="renderCalendar()"></select>
+      </div>
+
+      <h2 id="monthYear"></h2>
+      <div class="weekdays">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="calendar" id="calendar"></div>
+      
+      <div class="progress-container">
+        <div>Monthly Progress: <span id="progressText">0%</span></div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div class="summary-container">
+        <div class="summary-card" id="summaryBox"></div>
+        <div class="summary-card" id="overallSummary"></div>
+      </div>
+      
+      <div class="quote-box" id="quoteBox"></div>
+      <div class="badges" id="badgeBox"></div>
+    </div>
+  </div>
+
+  <script>
+    // DOM Elements
+    const calendar = document.getElementById('calendar');
+    const monthYear = document.getElementById('monthYear');
+    const summaryBox = document.getElementById('summaryBox');
+    const overallSummary = document.getElementById('overallSummary');
+    const quoteBox = document.getElementById('quoteBox');
+    const badgeBox = document.getElementById('badgeBox');
+    const monthSelect = document.getElementById('month');
+    const yearSelect = document.getElementById('year');
+    const progressText = document.getElementById('progressText');
+    const progressFill = document.getElementById('progressFill');
+
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"];
+
+    // Level descriptions and emojis
+    const levelInfo = {
+      0: { desc: "No effort", emoji: "❌" },
+      1: { desc: "Light effort", emoji: "🌱" },
+      2: { desc: "Moderate effort", emoji: "🔥" },
+      3: { desc: "Full effort", emoji: "💯" }
+    };
+
+    // Validate date format (YYYY-MM-DD)
+    function isValidDate(dateStr) {
+      const regex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!regex.test(dateStr)) return false;
+      const date = new Date(dateStr);
+      return !isNaN(date.getTime()) && dateStr === date.toISOString().split('T')[0];
+    }
+
+    // Initialize month and year dropdowns
+    function initDropdowns() {
+      try {
+        monthSelect.innerHTML = '';
+        yearSelect.innerHTML = '';
+        
+        for (let m = 0; m < 12; m++) {
+          const option = document.createElement("option");
+          option.value = m;
+          option.innerText = monthNames[m];
+          monthSelect.appendChild(option);
+        }
+
+        const currentYear = new Date().getFullYear();
+        for (let y = currentYear - 2; y <= currentYear + 3; y++) {
+          const option = document.createElement("option");
+          option.value = y;
+          option.innerText = y;
+          yearSelect.appendChild(option);
+        }
+
+        const today = new Date();
+        monthSelect.value = today.getMonth();
+        yearSelect.value = today.getFullYear();
+      } catch (err) {
+        console.error('Error initializing dropdowns:', err);
+        alert('Failed to initialize calendar. Please refresh the page.');
+      }
+    }
+
+    // Set journey start date
+    function setStartDate() {
+      try {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const startDate = prompt("Enter your journey start date (YYYY-MM-DD, e.g., 2025-04-23). Must be today or earlier:", todayStr);
+        if (startDate && isValidDate(startDate)) {
+          const start = new Date(startDate);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Normalize to start of day
+          if (start > today) {
+            alert("Start date cannot be in the future.");
+            return;
+          }
+          localStorage.setItem("journeyStartDate", startDate);
+          renderCalendar();
+        } else if (startDate) {
+          alert("Please enter a valid date in YYYY-MM-DD format (e.g., 2025-04-23)");
+        }
+      } catch (err) {
+        console.error('Error setting start date:', err);
+        alert('Failed to set start date. Please try again.');
+      }
+    }
+
+    // Get storage key for month/year
+    function getDataKey(y, m) {
+      return `consistency-${y}-${m}`;
+    }
+
+    // Calculate streak information
+    function calculateStreaks(savedData, daysInMonth, isCurrentMonth, currentDay, startDate, isStartMonth) {
+      let currentStreak = 0;
+      let maxStreak = 0;
+      let currentBlankStreak = 0;
+      let maxBlankStreak = 0;
+      let maxMediumStreak = 0;
+      let currentMediumStreak = 0;
+      
+      const endDay = isCurrentMonth ? Math.min(daysInMonth, currentDay) : daysInMonth;
+      const startDay = isStartMonth ? startDate.getDate() : 1;
+
+      for (let i = startDay; i <= endDay; i++) {
+        const dayKey = `day-${i}`;
+        const level = savedData[dayKey] || 0;
+        
+        if (level > 0) {
+          currentStreak++;
+          maxStreak = Math.max(maxStreak, currentStreak);
+          currentBlankStreak = 0;
+        } else {
+          currentBlankStreak++;
+          maxBlankStreak = Math.max(maxBlankStreak, currentBlankStreak);
+          currentStreak = 0;
+        }
+
+        if (level === 2) {
+          currentMediumStreak++;
+          maxMediumStreak = Math.max(maxMediumStreak, currentMediumStreak);
+        } else {
+          currentMediumStreak = 0;
+        }
+      }
+      
+      return { maxStreak, maxBlankStreak, maxMediumStreak };
+    }
+
+    // Render the calendar
+    function renderCalendar() {
+      try {
+        const month = parseInt(monthSelect.value);
+        const year = parseInt(yearSelect.value);
+        monthYear.innerText = `${monthNames[month]} ${year}`;
+        calendar.innerHTML = "";
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+        const effectiveDays = isCurrentMonth ? Math.min(daysInMonth, today.getDate()) : daysInMonth;
+        
+        const dataKey = getDataKey(year, month);
+        let savedData;
+        try {
+          savedData = JSON.parse(localStorage.getItem(dataKey) || '{}');
+        } catch (err) {
+          console.error('Error parsing saved data:', err);
+          savedData = {};
+        }
+
+        let totalEffort = 0;
+        let fullConsistent = 0;
+        let mediumEffortDays = 0;
+        let lightEffortDays = 0;
+        let anyEffortDays = 0;
+
+        const startDateStr = localStorage.getItem("journeyStartDate");
+        const isStartMonth = startDateStr && isValidDate(startDateStr) && new Date(startDateStr).getFullYear() === year && new Date(startDateStr).getMonth() === month;
+        const startDate = isStartMonth ? new Date(startDateStr) : null;
+
+        const streaks = calculateStreaks(savedData, daysInMonth, isCurrentMonth, today.getDate(), startDate, isStartMonth);
+
+        // Add empty divs for days before the 1st of the month
+        for (let i = 0; i < firstDay; i++) {
+          calendar.appendChild(document.createElement('div'));
+        }
+
+        // Create day elements
+        for (let i = 1; i <= daysInMonth; i++) {
+          const dayDiv = document.createElement('div');
+          dayDiv.classList.add('day');
+          
+          const dayKey = `day-${i}`;
+          let level = savedData[dayKey] || 0;
+          
+          // Highlight current day
+          if (isCurrentMonth && year === today.getFullYear() && i === today.getDate()) {
+            dayDiv.classList.add('current-day');
+          }
+          
+          // Create day content
+          dayDiv.innerHTML = `
+            <div class="day-number">${i}</div>
+            <div class="day-emoji">${levelInfo[level].emoji}</div>
+          `;
+          
+          if (level > 0 && (!isStartMonth || i >= startDate.getDate())) {
+            dayDiv.classList.add(`level-${level}`);
+            totalEffort += level;
+            anyEffortDays++;
+            if (level === 3) fullConsistent++;
+            if (level === 2) mediumEffortDays++;
+            if (level === 1) lightEffortDays++;
+          }
+
+          dayDiv.addEventListener('click', () => {
+            try {
+              level = (level + 1) % 4;
+              savedData[dayKey] = level;
+              localStorage.setItem(dataKey, JSON.stringify(savedData));
+              renderCalendar();
+            } catch (err) {
+              console.error('Error saving day data:', err);
+              alert('Failed to save effort level. Please try again.');
+            }
+          });
+
+          dayDiv.addEventListener('mouseover', () => {
+            dayDiv.title = levelInfo[level].desc;
+          });
+
+          dayDiv.addEventListener('mouseout', () => {
+            dayDiv.title = '';
+          });
+
+          calendar.appendChild(dayDiv);
+        }
+
+        // Calculate progress and percentages
+        const percentEffort = effectiveDays > 0 ? (totalEffort / (effectiveDays * 3) * 100).toFixed(1) : 0;
+        const effortDaysPercentage = effectiveDays > 0 ? (anyEffortDays / effectiveDays * 100).toFixed(1) : 0;
+        const fullConsistentPercentage = effectiveDays > 0 ? (fullConsistent / effectiveDays * 100).toFixed(1) : 0;
+        const mediumEffortPercentage = effectiveDays > 0 ? (mediumEffortDays / effectiveDays * 100).toFixed(1) : 0;
+        const lightEffortPercentage = effectiveDays > 0 ? (lightEffortDays / effectiveDays * 100).toFixed(1) : 0;
+
+        progressText.textContent = `${percentEffort}%`;
+        progressFill.style.width = `${percentEffort}%`;
+        
+        // Monthly summary
+        summaryBox.innerHTML = `
+          <h3>📊 Monthly Summary</h3>
+          <p>Total Days: <b>${daysInMonth}</b>${isCurrentMonth ? ` (Up to today: <b>${effectiveDays}</b>)` : ''}</p>
+          <p>Effort Days: <b>${anyEffortDays} (${effortDaysPercentage}%)</b></p>
+          <p>Light Effort Days: <b>${lightEffortDays} (${lightEffortPercentage}%)</b></p>
+          <p>Medium Effort Days: <b>${mediumEffortDays} (${mediumEffortPercentage}%)</b></p>
+          <p>Fully Consistent: <b>${fullConsistent} (${fullConsistentPercentage}%)</b></p>
+          <p>Max Streak: <b>${streaks.maxStreak} days</b></p>
+          <p>Max Break: <b>${streaks.maxBlankStreak} days</b></p>
+          <p>Effort Level: <b>${percentEffort}%</b></p>
+        `;
+
+        // Quotes
+        const quotes = [
+          { text: "Small steps every day lead to big changes.", author: "Anonymous" },
+          { text: "Consistency is the soul of mastery.", author: "Robin Sharma" },
+          { text: "The effort you put in today builds your tomorrow.", author: "Anonymous" },
+          { text: "Discipline is choosing what you want most over what you want now.", author: "Unknown" },
+          { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
+          { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" }
+        ];
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+        quoteBox.innerHTML = `✨ "${randomQuote.text}"<br><small>- ${randomQuote.author}</small>`;
+
+        // Badges
+        badgeBox.innerHTML = "";
+        if (fullConsistent >= 20) badgeBox.innerHTML += `<div class='badge'>🏅 Consistency King</div>`;
+        if (streaks.maxStreak >= 7) badgeBox.innerHTML += `<div class='badge'>🔥 ${streaks.maxStreak} Day Streak</div>`;
+        if (percentEffort >= 80) badgeBox.innerHTML += `<div class='badge'>💪 Hard Worker</div>`;
+        if (streaks.maxBlankStreak >= 5) badgeBox.innerHTML += `<div class='badge'>⚠️ Break Alert</div>`;
+        if (mediumEffortDays >= 10) badgeBox.innerHTML += `<div class='badge'>⚡ Medium Effort Master</div>`;
+        if (streaks.maxMediumStreak >= 5) badgeBox.innerHTML += `<div class='badge'>🔥 ${streaks.maxMediumStreak} Day Medium Streak</div>`;
+        if (fullConsistent >= 10) badgeBox.innerHTML += `<div class='badge'>🚀 Full Effort Pro</div>`;
+        if (anyEffortDays >= 25) badgeBox.innerHTML += `<div class='badge'>🏋️ Super Consistent</div>`;
+        if (percentEffort >= 90) badgeBox.innerHTML += `<div class='badge'>🌟 Elite Achiever</div>`;
+        if (mediumEffortDays >= 15) badgeBox.innerHTML += `<div class='badge'>🔥 Steady Flame</div>`;
+        if (streaks.maxStreak >= 14) badgeBox.innerHTML += `<div class='badge'>🏆 Marathon Runner</div>`;
+        if (fullConsistent === effectiveDays) badgeBox.innerHTML += `<div class='badge'>💯 Perfect Full Effort</div>`;
+        if (anyEffortDays >= 15 && streaks.maxBlankStreak <= 2) badgeBox.innerHTML += `<div class='badge'>🛡️ Relentless</div>`;
+        if (totalEffort >= effectiveDays * 2.7) badgeBox.innerHTML += `<div class='badge'>⚙️ Powerhouse</div>`;
+        if (lightEffortDays >= Math.ceil(effectiveDays * 0.4)) badgeBox.innerHTML += `<div class='badge'>🌱 Light Effort Star</div>`;
+        if (lightEffortDays >= 5 && mediumEffortDays >= 5 && fullConsistent >= 5) badgeBox.innerHTML += `<div class='badge'>🌈 Balanced Achiever</div>`;
+
+        // Overall Summary
+        try {
+          const startDateStr = localStorage.getItem("journeyStartDate");
+          if (startDateStr && isValidDate(startDateStr)) {
+            const startDate = new Date(startDateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (startDate > today) {
+              overallSummary.innerHTML = "<p>Start date is in the future. Please set a valid start date (YYYY-MM-DD).</p>";
+              return;
+            }
+
+            const diffTime = Math.abs(today - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            let totalEffortDays = 0;
+            let totalPossibleDays = 0;
+            let totalFullEffortDays = 0;
+            let totalMediumEffortDays = 0;
+            let totalLightEffortDays = 0;
+
+            // Cache localStorage data
+            const cachedData = {};
+            for (let y = startDate.getFullYear(); y <= today.getFullYear(); y++) {
+              for (let m = 0; m < 12; m++) {
+                const key = getDataKey(y, m);
+                try {
+                  cachedData[key] = JSON.parse(localStorage.getItem(key) || '{}');
+                } catch (err) {
+                  console.error(`Error parsing data for ${key}:`, err);
+                  cachedData[key] = {};
+                }
+              }
+            }
+
+            // Calculate stats for all months between start date and today
+            const startYear = startDate.getFullYear();
+            const startMonth = startDate.getMonth();
+            const endYear = today.getFullYear();
+            const endMonth = today.getMonth();
+
+            for (let y = startYear; y <= endYear; y++) {
+              const monthStart = y === startYear ? startMonth : 0;
+              const monthEnd = y === endYear ? endMonth : 11;
+
+              for (let m = monthStart; m <= monthEnd; m++) {
+                const monthData = cachedData[getDataKey(y, m)];
+                const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+                // Determine start and end days for the month
+                let dayStart = y === startYear && m === startMonth ? startDate.getDate() : 1;
+                let dayEnd = y === endYear && m === endMonth ? today.getDate() : daysInMonth;
+
+                for (let d = dayStart; d <= dayEnd; d++) {
+                  const level = Number(monthData[`day-${d}`]) || 0;
+                  if (level >= 0 && level <= 3) {
+                    if (level > 0) totalEffortDays++;
+                    if (level === 3) totalFullEffortDays++;
+                    if (level === 2) totalMediumEffortDays++;
+                    if (level === 1) totalLightEffortDays++;
+                    totalPossibleDays++;
+                  }
+                }
+              }
+            }
+
+            // Calculate percentages with validation
+            const overallPercentage = totalPossibleDays > 0 ? (totalEffortDays / totalPossibleDays * 100).toFixed(1) : 0;
+            const fullEffortPercentage = totalPossibleDays > 0 ? (totalFullEffortDays / totalPossibleDays * 100).toFixed(1) : 0;
+            const mediumEffortPercentage = totalPossibleDays > 0 ? (totalMediumEffortDays / totalPossibleDays * 100).toFixed(1) : 0;
+            const lightEffortPercentage = totalPossibleDays > 0 ? (totalLightEffortDays / totalPossibleDays * 100).toFixed(1) : 0;
+
+            overallSummary.innerHTML = `
+              <h3>🌍 Journey Summary</h3>
+              <p>Started on: <b>${startDateStr}</b></p>
+              <p>Days since start: <b>${diffDays} days</b></p>
+              <p>Total Effort Days: <b>${totalEffortDays} (${overallPercentage}%)</b></p>
+              <p>Light Effort Days: <b>${totalLightEffortDays} (${lightEffortPercentage}%)</b></p>
+              <p>Medium Effort Days: <b>${totalMediumEffortDays} (${mediumEffortPercentage}%)</b></p>
+              <p>Full Effort Days: <b>${totalFullEffortDays} (${fullEffortPercentage}%)</b></p>
+            `;
+          } else {
+            overallSummary.innerHTML = "<p>Set a valid start date (YYYY-MM-DD) to track your journey progress.</p>";
+          }
+        } catch (err) {
+          console.error('Error rendering overall summary:', err);
+          overallSummary.innerHTML = "<p>Error loading journey summary. Please check your start date and try again.</p>";
+        }
+      } catch (err) {
+        console.error('Error rendering calendar:', err);
+        alert('Failed to render calendar. Please refresh the page.');
+      }
+    }
+
+    // Export data
+    function exportData() {
+      try {
+        const data = {};
+        const currentYear = new Date().getFullYear();
+        
+        for (let y = currentYear - 2; y <= currentYear + 3; y++) {
+          for (let m = 0; m < 12; m++) {
+            const key = getDataKey(y, m);
+            const monthData = localStorage.getItem(key);
+            if (monthData) {
+              data[key] = JSON.parse(monthData);
+            }
+          }
+        }
+        
+        data.journeyStartDate = localStorage.getItem("journeyStartDate");
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `consistency-tracker-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('Error exporting data:', err);
+        alert('Failed to export data. Please try again.');
+      }
+    }
+
+    // Import data
+    function importData() {
+      try {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = e => {
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          
+          reader.onload = event => {
+            try {
+              const data = JSON.parse(event.target.result);
+              
+              // Clear existing data
+              for (let key in localStorage) {
+                if (key.startsWith('consistency-') || key === 'journeyStartDate') {
+                  localStorage.removeItem(key);
+                }
+              }
+
+              // Validate and import month data
+              for (const key in data) {
+                if (key.startsWith('consistency-')) {
+                  const monthData = data[key];
+                  const validatedData = {};
+                  for (const dayKey in monthData) {
+                    if (dayKey.startsWith('day-')) {
+                      const level = Number(monthData[dayKey]);
+                      if (!isNaN(level) && level >= 0 && level <= 3) {
+                        validatedData[dayKey] = level;
+                      }
+                    }
+                  }
+                  localStorage.setItem(key, JSON.stringify(validatedData));
+                }
+              }
+              
+              // Import start date if valid
+              if (data.journeyStartDate && isValidDate(data.journeyStartDate)) {
+                const startDate = new Date(data.journeyStartDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (startDate <= today) {
+                  localStorage.setItem("journeyStartDate", data.journeyStartDate);
+                } else {
+                  alert("Imported start date is in the future. Please set a valid date.");
+                }
+              } else if (data.journeyStartDate) {
+                alert("Invalid journey start date in imported file. Please set a valid date.");
+              }
+              
+              alert('Data imported successfully!');
+              renderCalendar();
+            } catch (err) {
+              console.error('Error importing data:', err);
+              alert('Error importing data: ' + err.message);
+            }
+          };
+          
+          reader.readAsText(file);
+        };
+        
+        input.click();
+      } catch (err) {
+        console.error('Error initiating import:', err);
+        alert('Failed to initiate data import. Please try again.');
+      }
+    }
+
+    // Show help
+    function showHelp() {
+      alert(`Consistency Tracker Help:
+
+1. Click a day to cycle through effort levels:
+   - No effort (❌, white): No activity.
+   - Light effort (🌱, light blue): Minimal effort.
+   - Moderate effort (🔥, blue): Solid effort.
+   - Full effort (💯, dark blue): Maximum effort.
+
+2. Set your journey start date (YYYY-MM-DD, e.g., 2025-04-23) to track overall progress. Must be today or earlier.
+
+3. Use the month/year dropdown to view different months.
+
+4. Export your data to save a backup; import to restore.
+
+5. Badges are awarded for:
+   - Consistency King: 20+ full effort days.
+   - Day Streak: 7+ consecutive effort days.
+   - Hard Worker: 80%+ effort level.
+   - Break Alert: 5+ consecutive no-effort days.
+   - Medium Effort Master: 10+ medium effort days.
+   - Medium Streak: 5+ consecutive medium effort days.
+   - Full Effort Pro: 10+ full effort days.
+   - Super Consistent: 25+ effort days.
+   - Elite Achiever: 90%+ effort level.
+   - Steady Flame: 15+ medium effort days.
+   - Marathon Runner: 14+ consecutive effort days.
+   - Perfect Full Effort: Full effort every day in a month.
+   - Relentless: 15+ effort days with ≤2 no-effort days.
+   - Powerhouse: High total effort (≥2.7 average per day).
+   - Light Effort Star: Many light effort days (≥40% of days).
+   - Balanced Achiever: 5+ days each of light, medium, full effort.
+
+Contact support if you encounter issues.`);
+    }
+
+    // Initialize the app
+    function init() {
+      try {
+        initDropdowns();
+        renderCalendar();
+      } catch (err) {
+        console.error('Error initializing app:', err);
+        alert('Failed to initialize app. Please refresh the page.');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
